@@ -10,7 +10,7 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
 import { store } from "../app/store";
@@ -22,7 +22,10 @@ export const LoginForm: React.VFC = () => {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm<{
+    appname: string;
+    instance: string;
+  }>();
 
   useEffect(() => {
     if (document.location.href.includes("localhost")) {
@@ -33,17 +36,12 @@ export const LoginForm: React.VFC = () => {
     }
   }, []);
 
-  type Inputs = {
-    appname: string;
-    instance: string;
-  };
-
   const [fetchState, updateFetchState] = useState<{
     ok: boolean;
     message: string;
   }>({ ok: true, message: "" });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit = (data: { appname: string; instance: string }) => {
     const id = uuid();
     const appURL = document.location.href;
     const checkMiAuthURL = `https://${data.instance}/api/endpoints`;
@@ -107,7 +105,7 @@ export const LoginForm: React.VFC = () => {
           </Heading>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
-              <FormControl isInvalid={errors.appname}>
+              <FormControl isInvalid={errors.appname ? true : false}>
                 <FormLabel htmlFor="appname">アプリ名</FormLabel>
                 <Input
                   id="appname"
@@ -119,7 +117,7 @@ export const LoginForm: React.VFC = () => {
                   {errors.appname && errors.appname.message}
                 </FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={errors.instance}>
+              <FormControl isInvalid={errors.instance ? true : false}>
                 <FormLabel htmlFor="instance">インスタンス名</FormLabel>
                 <Input
                   id="instance"

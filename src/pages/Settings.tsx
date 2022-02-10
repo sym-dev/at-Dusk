@@ -16,7 +16,14 @@ import { setTheme, setSettings, settings } from "../features/settingsSlice";
 import { useColorContext } from "../utils/ColorContext";
 export const Settings: React.VFC = () => {
   const { colors } = useColorContext();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm<{
+    lightTheme: string;
+    darkTheme: string;
+    autoMotto: boolean;
+    TLPostForm: boolean;
+    defaultVisibility: "public" | "home" | "followers" | "specified";
+    defaultLocalOnly: boolean;
+  }>();
   const dispatch = useAppDispatch();
   const settingsValue = useAppSelector(settings);
   const toast = useToast();
