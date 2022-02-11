@@ -1,4 +1,4 @@
-import { CSSReset, ColorModeScript } from "@chakra-ui/react";
+import { CSSReset, ColorModeScript, ChakraProvider } from "@chakra-ui/react";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -7,7 +7,6 @@ import { PersistGate } from "redux-persist/integration/react";
 
 import { store } from "./app/store";
 import "focus-visible";
-import { ThemeSelector } from "./components/ThemeSelector";
 import { App } from "./pages/App";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { ColorProvider } from "./utils/ColorContext";
@@ -26,11 +25,11 @@ ReactDOM.render(
       <PersistGate loading={null} persistor={persistor}>
         <LoginProvider>
           <ModalsProvider>
-            <ThemeSelector>
+            <ChakraProvider>
               <ColorProvider>
                 <App />
               </ColorProvider>
-            </ThemeSelector>
+            </ChakraProvider>
           </ModalsProvider>
         </LoginProvider>
       </PersistGate>

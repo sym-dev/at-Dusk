@@ -61,10 +61,10 @@ export const settingsSlice = createSlice({
   reducers: {
     setAttr: (state) => {
       document
-        .querySelector("#root")
+        .querySelector(":root")
         ?.setAttribute("mode", state.userInfo.themeMode);
       document
-        .querySelector("#root")
+        .querySelector(":root")
         ?.setAttribute(
           "theme",
           state.userInfo.themeMode === "dark"
@@ -82,7 +82,7 @@ export const settingsSlice = createSlice({
       if (action.payload.theme) {
         state.theme = action.payload.theme;
         document
-          .querySelector("#root")
+          .querySelector(":root")
           ?.setAttribute(
             "theme",
             state.userInfo.themeMode === "dark"
@@ -93,10 +93,10 @@ export const settingsSlice = createSlice({
       if (action.payload.themeMode) {
         state.userInfo.themeMode = action.payload.themeMode;
         document
-          .querySelector("#root")
+          .querySelector(":root")
           ?.setAttribute("mode", action.payload.themeMode);
         document
-          .querySelector("#root")
+          .querySelector(":root")
           ?.setAttribute(
             "theme",
             state.userInfo.themeMode === "dark"

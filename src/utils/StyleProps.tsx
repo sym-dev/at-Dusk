@@ -1,36 +1,33 @@
-import { useColors } from "./Colors";
-
 export const useStyleProps = (): Record<
   string,
   Record<string, string | Record<string, string>>
 > => {
-  const colors = useColors();
   return {
     AlphaButton: {
-      bgColor: colors.alpha200,
+      bgColor: "var(--alpha50)",
       _hover: {
-        bgColor: colors.alpha600,
+        bgColor: "var(--alpha600)",
       },
       _active: {
-        bgColor: colors.alpha400,
+        bgColor: "var(--alpha400)",
       },
     },
     PrimaryButton: {
-      bgColor: colors.primaryColor,
+      bgColor: "var(--primary)",
       _hover: {
-        bgColor: colors.primaryDarkerColor,
+        bgColor: "var(--primary_darker)",
       },
       _active: {
-        bgColor: colors.primaryDarkerColor,
+        bgColor: "var(--primary_darker)",
       },
     },
     DisabledBgColor: {
-      bgColor: colors.alpha50,
+      bgColor: "var(--alpha50)",
       _hover: {
-        bgColor: colors.alpha50,
+        bgColor: "var(--alpha50)",
       },
       _active: {
-        bgColor: colors.alpha0,
+        bgColor: "var(--alpha50)",
       },
     },
   };

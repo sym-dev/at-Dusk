@@ -1,4 +1,3 @@
-import { useColorModeValue } from "@chakra-ui/color-mode";
 import { Flex } from "@chakra-ui/react";
 import React, { memo } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -18,6 +17,7 @@ import { Settings } from "./Settings";
 import { User } from "./User";
 import { UserFF } from "./UserFF";
 import { UserNotes } from "./UserNotes";
+import "../style/theme.scss";
 
 export const App: React.VFC = memo(function Fn() {
   return (
@@ -26,7 +26,7 @@ export const App: React.VFC = memo(function Fn() {
         minH="100vh"
         direction="column"
         alignItems="center"
-        bgColor={useColorModeValue("light.base", "dark.base")}
+        bgColor="var(--base)"
         transitionDuration="normal"
         transitionProperty="background-color"
       >

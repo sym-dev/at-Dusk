@@ -37,9 +37,9 @@ export const LoginForm: React.VFC = () => {
         "127.0.0.1"
       );
     }
-    document.querySelector("#root")?.setAttribute("mode", theme);
+    document.querySelector(":root")?.setAttribute("mode", theme);
     document
-      .querySelector("#root")
+      .querySelector(":root")
       ?.setAttribute("theme", theme === "dark" ? "chillout" : "illuminating");
   }, [theme]);
 
