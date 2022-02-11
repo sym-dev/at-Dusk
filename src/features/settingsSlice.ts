@@ -29,6 +29,7 @@ export interface SettingsState {
     appname: string;
     userData: MeDetailed;
     instanceMeta: InstanceMetadata;
+    themeMode: "dark" | "light";
   };
 }
 
@@ -50,6 +51,7 @@ const initialState: SettingsState = {
     appname: "",
     userData: {} as MeDetailed,
     instanceMeta: {} as InstanceMetadata,
+    themeMode: "dark",
   },
 };
 
@@ -57,13 +59,51 @@ export const settingsSlice = createSlice({
   name: "settingsSlice",
   initialState,
   reducers: {
+    setAttr: (state) => {
+      document
+        .querySelector("#root")
+        ?.setAttribute("mode", state.userInfo.themeMode);
+      document
+        .querySelector("#root")
+        ?.setAttribute(
+          "theme",
+          state.userInfo.themeMode === "dark"
+            ? state.theme.darkTheme
+            : state.theme.lightTheme
+        );
+    },
     setTheme: (
       state,
       action: PayloadAction<{
-        theme: { lightTheme: string; darkTheme: string };
+        theme?: { lightTheme: string; darkTheme: string };
+        themeMode?: "dark" | "light";
       }>
     ) => {
-      state.theme = action.payload.theme;
+      if (action.payload.theme) {
+        state.theme = action.payload.theme;
+        document
+          .querySelector("#root")
+          ?.setAttribute(
+            "theme",
+            state.userInfo.themeMode === "dark"
+              ? action.payload.theme.darkTheme
+              : action.payload.theme.lightTheme
+          );
+      }
+      if (action.payload.themeMode) {
+        state.userInfo.themeMode = action.payload.themeMode;
+        document
+          .querySelector("#root")
+          ?.setAttribute("mode", action.payload.themeMode);
+        document
+          .querySelector("#root")
+          ?.setAttribute(
+            "theme",
+            state.userInfo.themeMode === "dark"
+              ? state.theme.darkTheme
+              : state.theme.lightTheme
+          );
+      }
     },
     setUserInfo: (
       state,
@@ -74,6 +114,7 @@ export const settingsSlice = createSlice({
         appname: string;
         userData: MeDetailed;
         instanceMeta: InstanceMetadata;
+        themeMode: "dark" | "light";
       }>
     ) => {
       state.userInfo.login = action.payload.login;
@@ -82,6 +123,7 @@ export const settingsSlice = createSlice({
       state.userInfo.appname = action.payload.appname;
       state.userInfo.userData = action.payload.userData;
       state.userInfo.instanceMeta = action.payload.instanceMeta;
+      state.userInfo.themeMode = action.payload.themeMode;
     },
     updateMeta: (state, action: PayloadAction<InstanceMetadata>) => {
       state.userInfo.instanceMeta = action.payload;
@@ -141,6 +183,7 @@ export const settingsSlice = createSlice({
 });
 
 export const {
+  setAttr,
   setTheme,
   setUserInfo,
   updateMeta,

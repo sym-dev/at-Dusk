@@ -26,6 +26,9 @@ export const LoginForm: React.VFC = () => {
     appname: string;
     instance: string;
   }>();
+  const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 
   useEffect(() => {
     if (document.location.href.includes("localhost")) {
@@ -34,7 +37,11 @@ export const LoginForm: React.VFC = () => {
         "127.0.0.1"
       );
     }
-  }, []);
+    document.querySelector("#root")?.setAttribute("mode", theme);
+    document
+      .querySelector("#root")
+      ?.setAttribute("theme", theme === "dark" ? "chillout" : "illuminating");
+  }, [theme]);
 
   const [fetchState, updateFetchState] = useState<{
     ok: boolean;
@@ -62,6 +69,7 @@ export const LoginForm: React.VFC = () => {
               ...settings,
               instance: data.instance,
               appname: data.appname,
+              themeMode: theme,
             })
           );
           const authURL =

@@ -5,6 +5,7 @@ import { useLocation, useMatch } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { Loading } from "../components/Loading";
 import { clearNoteDetails } from "../features/noteDetailsSlice";
+import { setAttr } from "../features/settingsSlice";
 import { clearFF, clearUserData, user } from "../features/userSlice";
 
 import { useSocketOpen } from "./SocketContext";
@@ -17,6 +18,9 @@ export const CheckLocation: React.VFC<{ children: React.ReactNode }> = memo(
     const location = useLocation();
     const userMatch = useMatch("/user/:id");
     const { isSocketOpen } = useSocketOpen();
+    useEffect(() => {
+      dispatch(setAttr());
+    }, [dispatch]);
     useEffect(() => {
       if (userData.id)
         updateUsername(
