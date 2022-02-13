@@ -472,7 +472,7 @@ const Quote: React.VFC<{
 }> = memo(function Fn({ note, name, depth, cw, updateCw }) {
   const { colors } = useColorContext();
   const [quoteCw, updateQuoteCw] = React.useState(
-    note.cw || note.cw === "" ? true : false
+    note.renote?.cw || note.renote?.cw === "" ? true : false
   );
   return (
     <Box>
