@@ -52,6 +52,9 @@ export const Header: React.VFC = memo(function Fn() {
             _hover={{
               bgColor: colors.alpha50,
             }}
+            _active={{
+              bgColor: colors.alpha400,
+            }}
           />
         </HStack>
         <HStack alignItems="center">
@@ -129,6 +132,7 @@ export const Header: React.VFC = memo(function Fn() {
           <IconButton
             aria-label="new note"
             icon={<EditIcon />}
+            color={colors.textColor}
             bgColor={colors.panelColor}
             shadow="md"
             onClick={onPostModalOpen}

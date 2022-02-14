@@ -160,7 +160,9 @@ const GeneralNote: React.VFC<{
                       marginLeft="1"
                       size="xs"
                       color={colors.headerTextColor}
-                      colorScheme="whiteAlpha"
+                      bgColor={colors.alpha200}
+                      _hover={{ bgColor: colors.alpha400 }}
+                      _active={{ bgColor: colors.alpha50 }}
                       onClick={() => {
                         updateCw(!cw);
                       }}

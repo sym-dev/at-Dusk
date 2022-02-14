@@ -8,14 +8,15 @@ import {
   Button,
   Stack,
   Heading,
+  useColorMode,
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
 import { store } from "../app/store";
-import { ColorModeSwitcher } from "../components/ColorModeSwitcher";
 import { setUserInfo } from "../features/settingsSlice";
+import { useColorContext } from "../utils/ColorContext";
 
 export const LoginForm: React.VFC = () => {
   const {
@@ -26,6 +27,8 @@ export const LoginForm: React.VFC = () => {
     appname: string;
     instance: string;
   }>();
+  const { colors } = useColorContext();
+  const { setColorMode } = useColorMode();
   const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
@@ -37,11 +40,12 @@ export const LoginForm: React.VFC = () => {
         "127.0.0.1"
       );
     }
+    setColorMode(theme);
     document.querySelector(":root")?.setAttribute("mode", theme);
     document
       .querySelector(":root")
       ?.setAttribute("theme", theme === "dark" ? "chillout" : "illuminating");
-  }, [theme]);
+  }, [theme, setColorMode]);
 
   const [fetchState, updateFetchState] = useState<{
     ok: boolean;
@@ -94,20 +98,22 @@ export const LoginForm: React.VFC = () => {
 
   return (
     <>
-      <ColorModeSwitcher
-        alignSelf="flex-end"
-        boxShadow="base"
-        marginBottom={2}
-      />
-      <Box minW="full">
-        <Container boxShadow="base" p={4}>
+      <Box minW="full" color={colors.textColor}>
+        <Container
+          boxShadow="base"
+          mt="6"
+          p={4}
+          borderRadius="md"
+          {...(theme === "dark" && { bgColor: colors.alpha50 })}
+        >
           <Heading
             as="h3"
             size="2xl"
-            marginBottom={6}
+            mb="4"
             fontWeight="normal"
             bgGradient="linear(to top, #ffa17f, #00223e)"
             bgClip="text"
+            isTruncated
           >
             at Dusk.
           </Heading>

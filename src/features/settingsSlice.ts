@@ -35,8 +35,8 @@ export interface SettingsState {
 
 const initialState: SettingsState = {
   theme: {
-    lightTheme: "",
-    darkTheme: "",
+    lightTheme: "illuminating",
+    darkTheme: "chillout",
   },
   timeline: "homeTimeline",
   defaultVisibility: "public",
