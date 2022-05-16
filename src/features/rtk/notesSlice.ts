@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ID, Note } from "misskey-js/built/entities";
 
-import { RootState } from "../app/store";
+import { RootState } from "../../app/store";
 
 export interface NoteType {
   id: ID;
@@ -12,6 +12,7 @@ export interface NotesState {
   notes: Array<Note>;
   noteTypes: Array<NoteType>;
   moreNote: boolean;
+  moreNoteLoading: boolean;
   isLastInstanceNote: boolean;
 }
 
@@ -19,6 +20,7 @@ const initialState: NotesState = {
   notes: [],
   noteTypes: [],
   moreNote: false,
+  moreNoteLoading: false,
   isLastInstanceNote: false,
 };
 
@@ -62,6 +64,9 @@ export const notesSlice = createSlice({
     updateMoreNote: (state, action: PayloadAction<boolean>) => {
       state.moreNote = action.payload;
     },
+    updateMoreNoteLoading: (state, action: PayloadAction<boolean>) => {
+      state.moreNoteLoading = action.payload;
+    },
     noteDelete: (
       state,
       action: PayloadAction<{
@@ -83,13 +88,21 @@ export const notesSlice = createSlice({
   },
 });
 
-export const { addUpper, addLower, updateMoreNote, noteDelete, clear } =
-  notesSlice.actions;
+export const {
+  addUpper,
+  addLower,
+  updateMoreNote,
+  updateMoreNoteLoading,
+  noteDelete,
+  clear,
+} = notesSlice.actions;
 
 export const allNoteTypes = (state: RootState): Array<NoteType> =>
   state.notes.noteTypes;
 export const allNotes = (state: RootState): Array<Note> => state.notes.notes;
 export const moreNote = (state: RootState): boolean => state.notes.moreNote;
+export const moreNoteLoading = (state: RootState): boolean =>
+  state.notes.moreNoteLoading;
 export const oldestNoteId = (state: RootState): string =>
   state.notes.notes.length > 0
     ? state.notes.notes[state.notes.notes.length - 1].id

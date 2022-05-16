@@ -1,18 +1,32 @@
-import React, { useEffect } from "react";
+import { HStack, Link, Text } from "@chakra-ui/react";
+import React from "react";
 import { memo } from "react";
-import { Navigate } from "react-router-dom";
+import { Link as routerLink } from "react-router-dom";
 
-import { useAppSelector } from "../app/hooks";
-import { settings } from "../features/settingsSlice";
-import { useLoginContext } from "../utils/LoginContext";
+import {
+  useGetLogin,
+  useSetIsLogin,
+  useSetTheme,
+} from "../features/recoil/loginState";
 
-export const Auth: React.VFC<{
+export const Auth: React.FC<{
   children: React.ReactNode;
 }> = memo(function Fn({ children }) {
-  const info = useAppSelector(settings).userInfo;
-  const { updateToken } = useLoginContext();
-  useEffect(() => {
-    if (info?.login) updateToken(info?.userToken as string);
-  }, [info, updateToken]);
-  return info?.login ? <>{children}</> : <Navigate to="/login" />;
+  useSetIsLogin();
+  useSetTheme();
+  const { login } = useGetLogin();
+  return login ? (
+    <>{children}</>
+  ) : (
+    <>
+      <HStack justify="center">
+        <Text mt="4" noOfLines={1}>
+          <Link as={routerLink} to="/login" color="blue.300" noOfLines={1}>
+            LOGIN
+          </Link>
+          REQUIRED
+        </Text>
+      </HStack>
+    </>
+  );
 });

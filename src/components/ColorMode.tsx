@@ -1,30 +1,26 @@
-import { IconButton, IconButtonProps, useColorMode } from "@chakra-ui/react";
-import React from "react";
-import { FaMoon } from "react-icons/fa";
+import { useColorMode } from "@chakra-ui/react";
+import React, { memo } from "react";
+import { IoMoon } from "react-icons/io5";
 
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { setTheme, settings } from "../features/settingsSlice";
+import { setTheme, settings } from "../features/rtk/settingsSlice";
 
-export const ColorModeSwitcher: React.VFC<
-  Omit<IconButtonProps, "aria-label">
-> = (props) => {
+import { IconButton } from "./ui/IconButton";
+
+export const ColorMode: React.FC = memo(function Fn() {
   const mode = useAppSelector(settings).userInfo.themeMode;
   const dispatch = useAppDispatch();
   const { setColorMode } = useColorMode();
-
   return (
     <IconButton
       size="md"
       fontSize="lg"
-      variant="ghost"
-      color="current"
       onClick={() => {
         dispatch(setTheme({ themeMode: mode === "dark" ? "light" : "dark" }));
         setColorMode(mode === "dark" ? "light" : "dark");
       }}
-      icon={<FaMoon />}
+      icon={<IoMoon />}
       aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-      {...props}
     />
   );
-};
+});

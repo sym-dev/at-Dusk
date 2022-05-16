@@ -18,18 +18,24 @@
       "version": "detect"
     }
   },
-  "plugins": ["react-hooks", "react", "@typescript-eslint", "import"],
+  "plugins": ["react-hooks", "@typescript-eslint", "import"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "prettier"
   ],
   "ignorePatterns": "src/style",
   "rules": {
     "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useRecoilCallback|useRecoilTransaction_UNSTABLE)"
+      }
+    ],
     "import/order": [
       "error",
       {

@@ -1,21 +1,10 @@
 import { useMemo } from "react";
 
-import { useLoginContext } from "./LoginContext";
-
-interface APIBody {
-  id: string;
-  endpoint: string;
-  data: Record<string, unknown>;
-}
+import { useGetLogin } from "../features/recoil/loginState";
 
 interface StreamBody {
   id: string;
   channel: string;
-}
-
-export interface APIObject {
-  type: string;
-  body: APIBody;
 }
 
 export interface StreamObject {
@@ -32,7 +21,7 @@ export interface DisconnectObject {
 
 interface Props {
   type: "api" | "connect" | "disconnect";
-  id: string;
+  id?: string;
   endpoint?: string;
   channel?: string;
   data?: Record<string, unknown>;
@@ -40,22 +29,15 @@ interface Props {
 
 export const useAPIObject = (
   props: Props
-): APIObject | StreamObject | DisconnectObject => {
-  const { token } = useLoginContext();
+): string | StreamObject | DisconnectObject => {
+  const { token } = useGetLogin();
   return useMemo(
     () =>
       props.type === "api"
-        ? ({
-            type: props.type,
-            body: {
-              id: props.id,
-              endpoint: props.endpoint,
-              data: {
-                i: token,
-                ...props.data,
-              },
-            },
-          } as APIObject)
+        ? JSON.stringify({
+            i: token,
+            ...props.data,
+          })
         : props.type === "connect"
         ? ({
             type: props.type,

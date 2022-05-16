@@ -1,15 +1,15 @@
-import React from "react";
+import React, { memo } from "react";
 import { Navigate } from "react-router-dom";
 
-import { useAppSelector } from "../app/hooks";
-import { settings } from "../features/settingsSlice";
+import { useGetLogin, useSetIsLogin } from "../features/recoil/loginState";
 
 import { GetToken } from "./GetToken";
 import { LoginForm } from "./LoginForm";
 
-export const Login: React.VFC = () => {
+export const Login: React.FC = memo(function Fn() {
   const session = getUuid();
-  const login = useAppSelector(settings).userInfo?.login;
+  useSetIsLogin();
+  const { login } = useGetLogin();
   return login ? (
     <Navigate to="/" />
   ) : session ? (
@@ -17,7 +17,7 @@ export const Login: React.VFC = () => {
   ) : (
     <LoginForm />
   );
-};
+});
 
 function getUuid(): string | null {
   const params = new URLSearchParams(document.location.search.substring(1));

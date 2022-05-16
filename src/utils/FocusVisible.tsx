@@ -1,5 +1,5 @@
 import { Global, css } from "@emotion/react";
-import React from "react";
+import React, { memo } from "react";
 
 const focusVisibleStyle = css`
   .js-focus-visible :focus:not([data-focus-visible-added]) {
@@ -8,10 +8,10 @@ const focusVisibleStyle = css`
   }
 `;
 
-export const FocusVisible: React.VFC = () => {
+export const FocusVisible: React.FC = memo(function Fn() {
   return (
     <>
       <Global styles={focusVisibleStyle} />
     </>
   );
-};
+});

@@ -5,23 +5,13 @@ import {
   MeDetailed,
 } from "misskey-js/built/entities";
 
-import { RootState } from "../app/store";
+import { RootState } from "../../app/store";
 
 export interface SettingsState {
   theme: {
     lightTheme: string;
     darkTheme: string;
   };
-  timeline:
-    | "homeTimeline"
-    | "localTimeline"
-    | "hybridTimeline"
-    | "globalTimeline";
-  autoMotto: boolean;
-  defaultVisibility: "public" | "home" | "followers" | "specified";
-  defaultLocalOnly: boolean;
-  TLPostForm: boolean;
-  RUEmoji: Array<CustomEmoji | string>;
   userInfo: {
     login: boolean;
     userToken: string;
@@ -31,6 +21,19 @@ export interface SettingsState {
     instanceMeta: InstanceMetadata;
     themeMode: "dark" | "light";
   };
+  client: {
+    timeline:
+      | "homeTimeline"
+      | "localTimeline"
+      | "hybridTimeline"
+      | "globalTimeline";
+    defaultVisibility: "public" | "home" | "followers" | "specified";
+    defaultLocalOnly: boolean;
+    autoMotto: boolean;
+    TLPostForm: boolean;
+    iconSidebar: boolean;
+    RUEmoji: Array<CustomEmoji | string>;
+  };
 }
 
 const initialState: SettingsState = {
@@ -38,12 +41,6 @@ const initialState: SettingsState = {
     lightTheme: "illuminating",
     darkTheme: "chillout",
   },
-  timeline: "homeTimeline",
-  defaultVisibility: "public",
-  defaultLocalOnly: false,
-  autoMotto: true,
-  TLPostForm: false,
-  RUEmoji: [],
   userInfo: {
     login: false,
     userToken: "",
@@ -53,25 +50,21 @@ const initialState: SettingsState = {
     instanceMeta: {} as InstanceMetadata,
     themeMode: "dark",
   },
+  client: {
+    timeline: "homeTimeline",
+    defaultVisibility: "public",
+    defaultLocalOnly: false,
+    autoMotto: true,
+    TLPostForm: false,
+    iconSidebar: false,
+    RUEmoji: [],
+  },
 };
 
 export const settingsSlice = createSlice({
   name: "settingsSlice",
   initialState,
   reducers: {
-    setAttr: (state) => {
-      document
-        .querySelector(":root")
-        ?.setAttribute("mode", state.userInfo.themeMode);
-      document
-        .querySelector(":root")
-        ?.setAttribute(
-          "theme",
-          state.userInfo.themeMode === "dark"
-            ? state.theme.darkTheme
-            : state.theme.lightTheme
-        );
-    },
     setTheme: (
       state,
       action: PayloadAction<{
@@ -125,12 +118,6 @@ export const settingsSlice = createSlice({
       state.userInfo.instanceMeta = action.payload.instanceMeta;
       state.userInfo.themeMode = action.payload.themeMode;
     },
-    updateMeta: (state, action: PayloadAction<InstanceMetadata>) => {
-      state.userInfo.instanceMeta = action.payload;
-    },
-    updateMe: (state, action: PayloadAction<MeDetailed>) => {
-      state.userInfo.userData = action.payload;
-    },
     setTimeline: (
       state,
       action: PayloadAction<{
@@ -141,39 +128,47 @@ export const settingsSlice = createSlice({
           | "globalTimeline";
       }>
     ) => {
-      state.timeline = action.payload.timeline;
+      state.client.timeline = action.payload.timeline;
     },
-    setSettings: (
+    setClientSettings: (
       state,
       action: PayloadAction<{
-        autoMotto: boolean;
-        TLPostForm: boolean;
+        timeline:
+          | "homeTimeline"
+          | "localTimeline"
+          | "hybridTimeline"
+          | "globalTimeline";
         defaultVisibility: "public" | "home" | "followers" | "specified";
         defaultLocalOnly: boolean;
+        autoMotto: boolean;
+        TLPostForm: boolean;
+        iconSidebar: boolean;
       }>
     ) => {
-      state.autoMotto = action.payload.autoMotto;
-      state.TLPostForm = action.payload.TLPostForm;
-      state.defaultVisibility = action.payload.defaultVisibility;
-      state.defaultLocalOnly = action.payload.defaultLocalOnly;
+      state.client.timeline = action.payload.timeline;
+      state.client.defaultVisibility = action.payload.defaultVisibility;
+      state.client.defaultLocalOnly = action.payload.defaultLocalOnly;
+      state.client.autoMotto = action.payload.autoMotto;
+      state.client.TLPostForm = action.payload.TLPostForm;
+      state.client.iconSidebar = action.payload.iconSidebar;
     },
     addRUEmoji: (state, action: PayloadAction<CustomEmoji | string>) => {
       if (typeof action.payload === "string") {
-        state.RUEmoji = state.RUEmoji.filter(
+        state.client.RUEmoji = state.client.RUEmoji.filter(
           (emoji) =>
             (typeof emoji === "string" && emoji !== action.payload) ||
             typeof emoji !== "string"
         );
       } else {
         const e = action.payload as CustomEmoji;
-        state.RUEmoji = state.RUEmoji.filter(
+        state.client.RUEmoji = state.client.RUEmoji.filter(
           (emoji) =>
             (typeof emoji !== "string" && emoji.name !== e.name) ||
             typeof emoji === "string"
         );
       }
-      state.RUEmoji.unshift(action.payload);
-      if (state.RUEmoji.length > 16) state.RUEmoji.pop();
+      state.client.RUEmoji.unshift(action.payload);
+      if (state.client.RUEmoji.length > 16) state.client.RUEmoji.pop();
     },
     setDefault: (state) => {
       state.theme = initialState.theme;
@@ -183,13 +178,10 @@ export const settingsSlice = createSlice({
 });
 
 export const {
-  setAttr,
   setTheme,
   setUserInfo,
-  updateMeta,
-  updateMe,
   setTimeline,
-  setSettings,
+  setClientSettings,
   addRUEmoji,
   setDefault,
 } = settingsSlice.actions;

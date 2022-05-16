@@ -3,26 +3,42 @@ export const useColors = (): Record<string, string> => {
   const alpha200 = "var(--alpha200)";
   const alpha400 = "var(--alpha400)";
   const alpha600 = "var(--alpha600)";
-  const baseColor = "var(--base)";
-  const panelColor = "var(--panel)";
-  const primaryColor = "var(--primary)";
-  const primaryDarkerColor = "var(--primary_darker)";
-  const secondaryColor = "var(--secondary)";
-  const textColor = "var(--text)";
-  const headerTextColor = "var(--headerText)";
-  const borderColor = "var(--secondary)";
+  const base = "var(--base)";
+  const baseThin = "var(--base_thin)";
+  const baseThick = "var(--base_thick)";
+  const baseAlpha = "var(--base_alpha)";
+  const panel = "var(--panel)";
+  const primary = "var(--primary)";
+  const primaryThin = "var(--primary_thin)";
+  const primaryThick = "var(--primary_thick)";
+  const secondary = "var(--secondary)";
+  const secondaryThin = "var(--secondary_thin)";
+  const secondaryThick = "var(--secondary_thick)";
+  const text = "var(--text)";
+  const textPrimary = "var(--text_primary)";
+  const textSecondary = "var(--text_secondary)";
+  const textInverse = "var(--text_inverse)";
+  const backdrop = "var(--backdrop)";
   return {
-    alpha50: alpha50,
-    alpha200: alpha200,
-    alpha400: alpha400,
-    alpha600: alpha600,
-    baseColor: baseColor,
-    panelColor: panelColor,
-    primaryColor: primaryColor,
-    primaryDarkerColor: primaryDarkerColor,
-    secondaryColor: secondaryColor,
-    textColor: textColor,
-    headerTextColor: headerTextColor,
-    borderColor: borderColor,
+    alpha50,
+    alpha200,
+    alpha400,
+    alpha600,
+    base,
+    baseThin,
+    baseThick,
+    baseAlpha,
+    panel,
+    primary,
+    primaryThin,
+    primaryThick,
+    secondary,
+    secondaryThin,
+    secondaryThick,
+    text,
+    textPrimary,
+    textSecondary,
+    textInverse,
+    backdrop,
   };
 };

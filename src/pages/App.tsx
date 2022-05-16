@@ -1,102 +1,81 @@
-import { Flex } from "@chakra-ui/react";
-import React, { memo } from "react";
+import { Box, HStack } from "@chakra-ui/react";
+import React, { memo, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { Auth } from "../components/Auth";
-import { Header } from "../components/Header";
-import { PostModal } from "../components/PostModal";
-import { CheckLocation } from "../utils/CheckLocation";
-import { SocketProvider } from "../utils/SocketContext";
+import { LeftBar } from "../components/LeftBar";
+import { MainHeader } from "../components/MainHeader";
+import { RightBar } from "../components/RightBar";
+import { useColorContext } from "../utils/ColorContext";
 import { SocketManager } from "../utils/SocketManager";
 
 import { Home } from "./Home";
 import { Login } from "./Login";
-import { Notes } from "./Notes";
-import { Notifications } from "./Notifications";
 import { Settings } from "./Settings";
-import { User } from "./User";
-import { UserFF } from "./UserFF";
-import { UserNotes } from "./UserNotes";
+import { UserPage } from "./UserPage";
+
 import "../style/theme.scss";
 
-export const App: React.VFC = memo(function Fn() {
+export const App: React.FC = memo(function Fn() {
+  const { colors } = useColorContext();
+  useEffect(() => {
+    if (document.location.href.includes("localhost")) {
+      document.location = document.location.href.replace(
+        "localhost",
+        "127.0.0.1"
+      );
+    }
+  }, []);
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      document.documentElement.style.setProperty(
+        "--vh",
+        `${window.innerHeight * 0.01}px`
+      );
+    });
+  }, []);
   return (
-    <Router>
-      <Flex
-        minH="100vh"
-        direction="column"
-        alignItems="center"
-        bgColor="var(--base)"
-        transitionDuration="normal"
-        transitionProperty="background-color"
-      >
+    <Box
+      minH="calc(var(--vh, 1vh) * 100)"
+      color={colors.text}
+      bgColor={colors.base}
+    >
+      <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="login" element={<Login />} />
           <Route
             path="*"
             element={
               <Auth>
-                <SocketProvider>
-                  <SocketManager>
-                    <Header />
-                    <Routes>
-                      <Route path="/settings" element={<Settings />} />
-                      <Route
-                        path="*"
-                        element={
-                          <CheckLocation>
-                            <Routes>
-                              <Route path="/user">
-                                <Route
-                                  path=":id/following"
-                                  element={
-                                    <>
-                                      <User />
-                                      <UserFF type="following" />
-                                    </>
-                                  }
-                                />
-                                <Route
-                                  path=":id/followers"
-                                  element={
-                                    <>
-                                      <User />
-                                      <UserFF type="followers" />
-                                    </>
-                                  }
-                                />
-                                <Route
-                                  path=":id"
-                                  element={
-                                    <>
-                                      <User />
-                                      <UserNotes />
-                                    </>
-                                  }
-                                />
-                              </Route>
-                              <Route path="/notes">
-                                <Route path=":id" element={<Notes />} />
-                              </Route>
-                              <Route
-                                path="/notifications"
-                                element={<Notifications />}
-                              />
-                              <Route path="/settings" element={<Settings />} />
-                              <Route path="/" element={<Home />} />
-                            </Routes>
-                          </CheckLocation>
-                        }
-                      />
-                    </Routes>
-                    <PostModal />
-                  </SocketManager>
-                </SocketProvider>
+                <SocketManager>
+                  <HStack justify="space-between" alignItems="start" w="full">
+                    <LeftBar />
+                    <Box flex="1" minW="1">
+                      <MainHeader />
+                      <Box
+                        sx={{
+                          "@media (min-aspect-ratio: 3/2)": {
+                            px: "10%",
+                          },
+                        }}
+                      >
+                        <Routes>
+                          <Route path="user">
+                            <Route path=":id" element={<UserPage />} />
+                          </Route>
+                          <Route path="settings" element={<Settings />} />
+                          <Route path="/" element={<Home />} />
+                        </Routes>
+                      </Box>
+                    </Box>
+                    <RightBar />
+                  </HStack>
+                </SocketManager>
               </Auth>
             }
           />
         </Routes>
-      </Flex>
-    </Router>
+      </Router>
+    </Box>
   );
 });

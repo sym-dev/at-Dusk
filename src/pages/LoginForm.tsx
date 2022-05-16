@@ -1,24 +1,29 @@
 import {
   Box,
   Container,
+  FormControl,
   FormErrorMessage,
   FormLabel,
-  FormControl,
-  Input,
-  Button,
-  Stack,
   Heading,
   useColorMode,
+  VStack,
 } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
 import { store } from "../app/store";
-import { setUserInfo } from "../features/settingsSlice";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { setUserInfo } from "../features/rtk/settingsSlice";
 import { useColorContext } from "../utils/ColorContext";
 
-export const LoginForm: React.VFC = () => {
+export const LoginForm: React.FC = memo(function Fn() {
+  const { colors } = useColorContext();
+  const { setColorMode } = useColorMode();
+  const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
   const {
     handleSubmit,
     register,
@@ -27,25 +32,6 @@ export const LoginForm: React.VFC = () => {
     appname: string;
     instance: string;
   }>();
-  const { colors } = useColorContext();
-  const { setColorMode } = useColorMode();
-  const theme = window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-
-  useEffect(() => {
-    if (document.location.href.includes("localhost")) {
-      document.location = document.location.href.replace(
-        "localhost",
-        "127.0.0.1"
-      );
-    }
-    setColorMode(theme);
-    document.querySelector(":root")?.setAttribute("mode", theme);
-    document
-      .querySelector(":root")
-      ?.setAttribute("theme", theme === "dark" ? "chillout" : "illuminating");
-  }, [theme, setColorMode]);
 
   const [fetchState, updateFetchState] = useState<{
     ok: boolean;
@@ -56,16 +42,10 @@ export const LoginForm: React.VFC = () => {
     const id = uuid();
     const appURL = document.location.href;
     const checkMiAuthURL = `https://${data.instance}/api/endpoints`;
-    fetch(checkMiAuthURL, {
-      method: "POST",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} ${res.statusText}`);
-        }
-        return res.json();
-      })
-      .then((text) => {
+    (async () => {
+      try {
+        const res = await fetch(checkMiAuthURL, { method: "POST" });
+        const text = await res.json();
         if (text.includes("miauth/gen-token")) {
           const settings = store.getState().settings.userInfo;
           store.dispatch(
@@ -87,84 +67,85 @@ export const LoginForm: React.VFC = () => {
             message: "インスタンスがMiAuthに対応していないようです",
           });
         }
-      })
-      .catch(() => {
+      } catch {
         updateFetchState({
           ok: false,
           message: "それはMisskeyのインスタンスですか？",
         });
-      });
+      }
+    })();
   };
 
+  useEffect(() => {
+    document.querySelector(":root")?.setAttribute("mode", theme);
+    document
+      .querySelector(":root")
+      ?.setAttribute("theme", theme === "dark" ? "chillout" : "illuminating");
+    setColorMode(theme);
+  }, [theme, setColorMode]);
+
   return (
-    <>
-      <Box minW="full" color={colors.textColor}>
-        <Container
-          boxShadow="base"
-          mt="6"
-          p={4}
-          borderRadius="md"
-          {...(theme === "dark" && { bgColor: colors.alpha50 })}
+    <Box pt="10">
+      <Container
+        p="4"
+        maxW="container.sm"
+        borderRadius="md"
+        shadow="md"
+        bgColor={colors.panel}
+      >
+        <Heading
+          as="h3"
+          size="2xl"
+          mb="4"
+          fontWeight="normal"
+          bgGradient="linear(to top, #ffa17f, #00223e)"
+          bgClip="text"
+          noOfLines={1}
         >
-          <Heading
-            as="h3"
-            size="2xl"
-            mb="4"
-            fontWeight="normal"
-            bgGradient="linear(to top, #ffa17f, #00223e)"
-            bgClip="text"
-            isTruncated
-          >
-            at Dusk.
-          </Heading>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
-              <FormControl isInvalid={errors.appname ? true : false}>
-                <FormLabel htmlFor="appname">アプリ名</FormLabel>
-                <Input
-                  id="appname"
-                  placeholder="@dusk"
-                  defaultValue="@dusk"
-                  {...register("appname", { required: "アプリ名は必須です" })}
-                />
-                <FormErrorMessage>
-                  {errors.appname && errors.appname.message}
-                </FormErrorMessage>
+          at Dusk.
+        </Heading>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <VStack>
+            <FormControl isInvalid={errors.appname ? true : false}>
+              <FormLabel htmlFor="appname">アプリ名</FormLabel>
+              <Input
+                id="appname"
+                placeholder="@dusk"
+                defaultValue="@dusk"
+                {...register("appname", { required: "アプリ名は必須です" })}
+              />
+              <FormErrorMessage>
+                {errors.appname && errors.appname.message}
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={errors.instance ? true : false}>
+              <FormLabel htmlFor="instance">インスタンス名</FormLabel>
+              <Input
+                id="instance"
+                placeholder="misskey.io"
+                {...register("instance", {
+                  required: "インスタンス名は必須です",
+                  pattern: {
+                    value: /(\S+\.)?\S+\.\S+/,
+                    message: "インスタンスのドメインを入力してください。",
+                  },
+                })}
+              />
+              <FormErrorMessage>
+                {errors.instance && errors.instance.message}
+              </FormErrorMessage>
+            </FormControl>
+            {!fetchState.ok && (
+              <FormControl isInvalid={!fetchState.ok}>
+                <FormErrorMessage>{fetchState.message}</FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={errors.instance ? true : false}>
-                <FormLabel htmlFor="instance">インスタンス名</FormLabel>
-                <Input
-                  id="instance"
-                  placeholder="misskey.io"
-                  {...register("instance", {
-                    required: "インスタンス名は必須です",
-                    pattern: {
-                      value: /(\S+\.)?\S+\.\S+/,
-                      message: "インスタンスのドメインを入力してください。",
-                    },
-                  })}
-                />
-                <FormErrorMessage>
-                  {errors.instance && errors.instance.message}
-                </FormErrorMessage>
-              </FormControl>
-              {!fetchState.ok && (
-                <FormControl isInvalid={!fetchState.ok}>
-                  <FormErrorMessage>{fetchState.message}</FormErrorMessage>
-                </FormControl>
-              )}
-              <Button
-                mt={4}
-                colorScheme="teal"
-                isLoading={isSubmitting}
-                type="submit"
-              >
-                Register
-              </Button>
-            </Stack>
-          </form>
-        </Container>
-      </Box>
-    </>
+            )}
+            <Button model="primary" isLoading={isSubmitting} type="submit">
+              Register
+            </Button>
+          </VStack>
+        </form>
+      </Container>
+    </Box>
   );
-};
+});

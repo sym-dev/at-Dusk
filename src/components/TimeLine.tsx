@@ -1,100 +1,67 @@
-import { Button } from "@chakra-ui/button";
-import { Box, Center } from "@chakra-ui/react";
-import { Note as NoteType } from "misskey-js/built/entities";
-import React, { useEffect, useRef } from "react";
-import { memo } from "react";
+import { Box, Center, VStack } from "@chakra-ui/react";
+import React, { memo, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { useAppSelector, useAppDispatch } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   allNotes,
   allNoteTypes,
-  oldestNoteId,
-  moreNote,
+  moreNoteLoading,
   updateMoreNote,
-  isLastInstanceNote,
-} from "../features/notesSlice";
-import { settings } from "../features/settingsSlice";
-import { useSocket } from "../utils/SocketContext";
-import { useAPIObject } from "../utils/useAPIObject";
+  updateMoreNoteLoading,
+} from "../features/rtk/notesSlice";
+import { settings } from "../features/rtk/settingsSlice";
+import { useGetMoreNotes } from "../features/swr/useGetMoreNotes";
+import { useGetMoreNotesByButton } from "../features/swr/useGetMoreNotesByButton";
 
-import { Loading } from "./Loading";
 import { Note } from "./Note";
+import { Button } from "./ui/Button";
+import { Loading } from "./ui/Loading";
 
-export const TimeLine: React.VFC = memo(function Fn() {
-  const socket = useSocket();
-  const dispatch = useAppDispatch();
+export const TimeLine = memo(function Fn() {
   const notes = useAppSelector(allNotes);
   const noteTypes = useAppSelector(allNoteTypes);
-  const motto = useAppSelector(moreNote);
-  const last = useAppSelector(isLastInstanceNote);
-  const autoMotto = useAppSelector(settings).autoMotto;
-  const TLType = useAppSelector(settings).timeline;
-  const dontEffect = useRef(true);
-  const moreNotesObject = useAPIObject({
-    id: "moreNotes",
-    type: "api",
-    endpoint:
-      TLType === "homeTimeline"
-        ? "notes/timeline"
-        : TLType === "localTimeline"
-        ? "notes/local-timeline"
-        : TLType === "hybridTimeline"
-        ? "notes/hybrid-timeline"
-        : "notes/global-timeline",
-    data: {
-      limit: 15,
-      untilId: useAppSelector(oldestNoteId),
-    },
-  });
+  const { autoMotto } = useAppSelector(settings).client;
+  const [mottoClicked, updateMotto] = useState(false);
+  const dispatch = useAppDispatch();
   const { ref, inView } = useInView({
-    threshold: 0.5,
+    threshold: 0.8,
   });
+  const moreLoading = useAppSelector(moreNoteLoading);
+  useGetMoreNotes(autoMotto && inView);
+  useGetMoreNotesByButton(mottoClicked, updateMotto);
   useEffect(() => {
-    if (autoMotto) {
-      if (dontEffect.current) {
-        dontEffect.current = false;
-      } else if (inView && !motto) {
-        dispatch(updateMoreNote(true));
-        socket.send(JSON.stringify(moreNotesObject));
-      }
+    if (autoMotto && inView) {
+      dispatch(updateMoreNote(inView));
+      dispatch(updateMoreNoteLoading(true));
     }
-  }, [socket, dispatch, moreNotesObject, autoMotto, motto, inView]);
-  return (
-    <Box maxW="95vw" w="6xl">
-      {notes.length ? (
-        <>
-          {notes.map((note: NoteType, i) => (
-            <Box paddingBlock="1" key={note.id}>
-              <Note note={note} type={noteTypes[i]} depth={0} />
-            </Box>
-          ))}
-          {autoMotto && !last ? (
-            <Center>
-              {!motto ? <Box ref={ref} p="9" /> : <Loading small />}
-            </Center>
-          ) : (
-            !last && (
-              <Center marginBottom="2">
-                <Button
-                  aria-label="more notes"
-                  size="lg"
-                  onClick={() => {
-                    dispatch(updateMoreNote(true));
-                    socket.send(JSON.stringify(moreNotesObject));
-                  }}
-                >
-                  {motto ? <Loading small /> : "もっと"}
-                </Button>
-              </Center>
-            )
-          )}
-        </>
-      ) : (
-        <Center>
-          <Loading />
-        </Center>
-      )}
-    </Box>
+    if (mottoClicked) {
+      dispatch(updateMoreNote(true));
+      dispatch(updateMoreNoteLoading(true));
+    }
+  }, [dispatch, inView, autoMotto, mottoClicked]);
+  return notes.length ? (
+    <VStack alignItems="start" pb="4">
+      {notes.map((note, i) => (
+        <Box key={note.id} w="full">
+          <Note note={note} type={noteTypes[i]} />
+        </Box>
+      ))}
+      <Button
+        model="alpha"
+        alignSelf="center"
+        ref={ref}
+        disabled={moreLoading}
+        onClick={() => {
+          updateMotto(true);
+        }}
+      >
+        {!moreLoading ? "MOTTO" : <Loading small />}
+      </Button>
+    </VStack>
+  ) : (
+    <Center>
+      <Loading />
+    </Center>
   );
 });
